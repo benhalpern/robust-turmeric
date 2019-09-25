@@ -1,0 +1,414 @@
+stackbitVersion: ~0.2.0
+ssgName: gatsby
+ssgVersion: 0.1.12
+buildCommand: ./ssg-build.sh
+publishDir: public
+staticDir: static
+uploadDir: images
+dataDir: src/data
+pagesDir: src/pages
+pageLayoutKey: template
+metadata:
+  title: Vanilla
+  description: Stackbit Vanilla theme
+  author: Stackbit
+  authorURL: 'https://www.stackbit.com'
+  images:
+    small: images/demo-256x192.png
+    large: images/demo-1024x768.png
+collections:
+  - label: Home
+    source: pages
+    create: true
+    models:
+      - home
+  - label: Pages
+    source: pages
+    create: true
+    models:
+      - page
+      - generic
+  - label: Posts
+    source: pages
+    create: true
+    models:
+      - post
+sourceMapping:
+  - source:
+      fieldPath: author.name
+    target:
+      file: data/author.json
+      fieldPath: name
+  - source:
+      fieldPath: author.name
+    target:
+      file: data/header.yml
+      fieldPath: content
+  - source:
+      fieldPath: author.avatar
+    target:
+      file: data/author.json
+      fieldPath: avatar
+  - source:
+      fieldPath: author.avatar
+    target:
+      file: content/index.md
+      fieldPath: 'sections[0].image'
+  - action: delete
+    condition: context.author.name
+    target:
+      file: content/index.md
+      fieldPath: 'sections[3].text'
+  - action: delete
+    condition: context.author.name
+    target:
+      file: content/index.md
+      fieldPath: 'sections[3].image'
+  - action: delete
+    condition: context.author.name
+    target:
+      file: content/index.md
+      fieldPath: 'sections[1].content'
+  - action: delete
+    condition: context.author.name
+    target:
+      file: content/index.md
+      fieldPath: 'sections[0].subtitle'
+  - source:
+      fieldPath: author.tagline
+    target:
+      file: content/index.md
+      fieldPath: 'sections[0].title'
+stackbit_banner:
+  show_banner: true
+  name: Vanilla
+  create_url: 'https://app.stackbit.com/create?theme=vanilla'
+  github_url: 'https://github.com/stackbithq/stackbit-theme-vanilla'
+models:
+  config:
+    type: config
+    label: Global Site Config
+    fields:
+      - type: string
+        name: title
+        label: Title
+        description: Site title
+        required: true
+      - type: string
+        name: none
+        label: None
+        hidden: true
+        description: 'An empty var, used so the site params section will function'
+  header:
+    type: data
+    file: header.yml
+    label: Header Configuration
+    fields:
+      - type: markdown
+        name: content
+        label: Header Content
+      - type: boolean
+        name: has_nav
+        label: Navigation Menu
+        description: Display the navigation bar in the header
+        default: true
+  footer:
+    type: data
+    file: footer.yml
+    label: Footer Configuration
+    fields:
+      - type: markdown
+        name: content
+        label: Footer Content
+      - type: list
+        name: links
+        label: Links
+        description: A list of links to display in the footer of the site
+        items:
+          type: object
+          labelField: text
+          fields:
+            - type: string
+              name: text
+              label: Link text
+            - type: string
+              name: url
+              label: URL
+              widget: url
+            - type: boolean
+              name: new_window
+              label: Open in new window
+              default: true
+  social:
+    type: data
+    file: social.json
+    label: Social Links
+    fields:
+      - type: list
+        name: links
+        label: Social Links
+        description: A list of social links displayed on the left side.
+        items:
+          type: object
+          labelField: type
+          fields:
+            - type: string
+              name: type
+              label: Type
+              required: true
+            - type: string
+              name: url
+              label: URL
+              widget: url
+  author:
+    type: data
+    file: author.json
+    label: Author
+    fields:
+      - type: string
+        name: name
+        label: Name
+      - type: string
+        name: email
+        label: Email
+      - type: image
+        name: avatar
+        label: Avatar
+  home:
+    type: page
+    label: Home
+    hideContent: true
+    template: home
+    singleInstance: true
+    file: index.md
+    fields:
+      - type: string
+        name: title
+        label: Title
+        description: The title of the page
+        required: true
+      - type: list
+        name: sections
+        label: Sections
+        description: Home sections
+        items:
+          type: reference
+          labelField: title
+          models:
+            - postlist
+            - contentblock
+            - textimageblock
+            - heroblock
+      - type: page_menus
+        name: menus
+        label: Home Menus
+        description: Which menus should this page show up in
+  page:
+    type: page
+    label: Page
+    template: page
+    exclude: posts/**
+    fields:
+      - type: string
+        name: title
+        label: Title
+        description: The title of the page
+        required: true
+      - type: string
+        name: subtitle
+        label: Subtitle
+        description: Text that is shown just above the title
+      - type: page_menus
+        name: menus
+        label: Page Menus
+        description: Which menus should this page show up in
+  post:
+    type: page
+    label: Post
+    folder: posts
+    template: post
+    fields:
+      - type: string
+        name: title
+        label: Title
+        description: The title of the page
+        required: true
+      - type: string
+        name: subtitle
+        label: Subtitle
+        description: Text that is shown just above the title
+      - type: image
+        name: content_img_path
+        label: Image
+        description: The image shown on top of the page
+      - type: string
+        name: excerpt
+        label: Home Excerpt
+        description: Excerpt to be displayed in any thumbnails for the post
+      - type: date
+        name: date
+        label: Date
+        required: true
+      - type: image
+        name: thumb_img_path
+        label: Alternate Image
+        description: image to be displayed in any thumbnails for the post
+      - type: page_menus
+        name: menus
+        label: Post Menus
+        description: Which menus should this page show up in
+  action:
+    type: object
+    label: Action
+    labelField: label
+    fields:
+      - type: string
+        name: label
+        label: Label
+      - type: string
+        name: url
+        label: URL
+        widget: url
+  section:
+    type: object
+    label: Section
+    labelField: title
+    fields:
+      - type: string
+        name: title
+        label: Section Title
+        description: >-
+          The section title (Used by the CMS, even if it is not displayed in the
+          section)
+      - type: string
+        name: section_id
+        label: Element ID
+      - type: string
+        name: component
+        label: Component
+        required: true
+        hidden: true
+  postlist:
+    type: object
+    label: Post List
+    extends:
+      - section
+    fields:
+      - name: component
+        const: Postlist
+  contentblock:
+    type: object
+    label: Content Section
+    extends:
+      - section
+    fields:
+      - name: component
+        const: ContentBlock
+      - type: markdown
+        name: content
+        label: Content
+        description: The text content of the section
+  textimageblock:
+    type: object
+    label: Content Section With Image
+    extends:
+      - section
+    fields:
+      - name: component
+        const: TextImageBlock
+      - type: markdown
+        name: text
+        label: Text
+        description: The text content of the section
+      - type: image
+        name: image
+        label: Image
+        description: The image to display with the text
+  heroblock:
+    type: object
+    label: Hero Header With Image
+    extends:
+      - section
+    fields:
+      - name: component
+        const: HeroBlock
+      - type: markdown
+        name: subtitle
+        label: Subtitle
+        description: The subtitle of the header section
+      - type: image
+        name: image
+        label: Image
+        description: The image to display with the text
+  site_menus:
+    type: data
+    file: menus.json
+    label: Site Menus
+    labelField: null
+    description: >-
+      Site menus model, defines list of menus that can be specified from within
+      site configuration
+    fields:
+      - type: list
+        name: main
+        label: Main menu
+        description: List of items for Main menu
+        items:
+          type: site_menu_item
+  site_menu_item:
+    type: object
+    label: Site Menu Item
+    labelField: title
+    description: 'Site menu item model, defines fields for a single site menu item'
+    fields:
+      - type: string
+        name: identifier
+        label: Identifier
+        description: >-
+          The identifier of a menu item could be used as a parent menu of
+          another menu item
+        required: true
+      - type: string
+        name: title
+        label: Title
+        description: The title of the menu item
+        required: true
+      - type: string
+        name: url
+        label: URL
+        description: The URL the menu item links to
+        required: true
+      - type: number
+        name: weight
+        label: Weight
+        description: Position for sorting
+  page_menus:
+    type: object
+    label: Page Menus
+    labelField: null
+    description: 'Page menus model, defines menus that can be specified from within pages'
+    fields:
+      - type: page_menu_item
+        name: main
+        label: Main menu item
+        description: Main menu item for this page
+  page_menu_item:
+    type: object
+    label: Page Menu Item
+    labelField: title
+    description: 'Page menu item model, defines fields for a single page menu item'
+    fields:
+      - type: string
+        name: title
+        label: Title
+        description: The title of the menu item
+      - type: number
+        name: weight
+        label: Weight
+        description: Position for sorting
+      - type: string
+        name: identifier
+        label: Identifier
+        description: >-
+          The identifier of a menu item could be used as a parent menu of
+          another menu item
